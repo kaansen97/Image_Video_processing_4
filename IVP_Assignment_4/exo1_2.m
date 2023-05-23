@@ -49,17 +49,14 @@ for i = 1:num_clusters
     normalized_layer = double(layer) ./ 255;
     
     % Convert the normalized layer to the HSL color space
-    hsl_layer = rgb2hsv(normalized_layer);
+    lab_layer = rgb2lab(normalized_layer);
     
-    % Modify the layer as desired (e.g., change hue, lightness, or saturation)
-    % Example modification: increase saturation
-    hsl_layer(:, :, 2) = hsl_layer(:, :, 2) * 1.5; % Increase saturation by a factor of 1.5
     
     % Convert the modified layer back to the RGB color space
-    modified_layer = hsv2rgb(hsl_layer);
+    modified_layer = lab2rgb(lab_layer);
     
     % Plot the modified layer
     subplot(num_clusters+1, 2, (i+1)*2-1);
     imshow(modified_layer);
-    title(sprintf('Layer %d (Modified)', i));
+    title(sprintf('Layer %d (CIELab)', i));
 end
