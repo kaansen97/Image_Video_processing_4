@@ -1,11 +1,23 @@
-% Step 1: Loading Image in linear RGB space
+% Step 1: Loading Image in sRGB space and transforming it to CIELAB
 img = imread('queen.jpg');
-linear_rgb_im = im2double(img);
+Cielab_im = rgb2lab(img);
 
-% step 2: Perform K-means clustering
+% Reshape the image matrix
+image_reshaped = reshape(Cielab_im, [], 3);
+
+% Perform K-means clustering
 num_clusters = 7;
-[idx, centroids] = kmeans(reshape(linear_rgb_im, [], 3), num_clusters);
-palette_colors_rgb = centroids;
+[idx, centroids] = kmeans(image_reshaped, num_clusters);
+
+% Compute the centroid colors in CIELAB space
+palette_colors_lab = centroids;
+
+% Convert the palette colors from CIELAB to sRGB
+palette_colors_rgb = lab2rgb(palette_colors_lab);
+
+% Print the palette colors
+disp('Palette Colors:');
+disp(palette_colors_rgb);
 
 % Create a figure to display the images side by side
 figure;
@@ -33,10 +45,14 @@ for i = 1:num_clusters
     layer = img;
     layer(repmat(~mask, [1, 1, 3])) = 0;
     
+    % Normalize the layer to the range of 0 to 1
     normalized_layer = double(layer) ./ 255;
+    
     % Convert the normalized layer to the HSL color space
     hsl_layer = rgb2hsv(normalized_layer);
     
+    % Modify the layer as desired (e.g., change hue, lightness, or saturation)
+    % Example modification: increase saturation
     hsl_layer(:, :, 2) = hsl_layer(:, :, 2) * 1.5; % Increase saturation by a factor of 1.5
     
     % Convert the modified layer back to the RGB color space
@@ -45,5 +61,5 @@ for i = 1:num_clusters
     % Plot the modified layer
     subplot(num_clusters+1, 2, (i+1)*2-1);
     imshow(modified_layer);
-    title(sprintf('Layer %d (HSL)', i));
+    title(sprintf('Layer %d (Modified)', i));
 end

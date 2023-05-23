@@ -1,0 +1,44 @@
+% Step 1: Loading Image in RGB space
+img = imread('queen.jpg');
+
+% Step 2: Reshape the image matrix
+image_reshaped = double(reshape(img, [], 3));
+
+% Step 3: Perform K-means clustering to find 32 representative colors
+num_colors = 32;
+max_iterations = 1000; % Increase the maximum number of iterations
+options = statset('MaxIter', max_iterations);
+[indices, centroids] = kmeans(image_reshaped, num_colors, 'Options', options, 'Replicates', 5);
+
+% Step 4: Assign each pixel to its nearest representative color
+quantized_image = reshape(centroids(indices, :), size(img));
+
+% Step 5: Convert the quantized RGB image to grayscale using a lookup table (LUT)
+% Create a lookup table for mapping RGB colors to grayscale values
+lut = rgb2gray(centroids);
+lut = repmat(lut, [1, 1, 3]); % Convert grayscale values to RGB triplets
+
+% Apply the lookup table to map the quantized colors to grayscale values
+grayscale_image = zeros(size(quantized_image, 1), size(quantized_image, 2));
+for i = 1:num_colors
+    mask = (quantized_image(:, :, 1) == centroids(i, 1) & ...
+        quantized_image(:, :, 2) == centroids(i, 2) & ...
+        quantized_image(:, :, 3) == centroids(i, 3));
+    grayscale_image(mask) = lut(i, 1, 1);
+end
+
+
+% Display the quantized color image
+figure;
+subplot(1, 3, 1);
+imshow(uint8(img));
+title('Original Color Image');
+
+subplot(1, 3, 2);
+imshow(uint8(quantized_image));
+title('Quantized Color Image');
+
+% Display the resulting grayscale image
+subplot(1, 3, 3);
+imshow(grayscale_image, []);
+title('Grayscale Image (after applying LUT)');
