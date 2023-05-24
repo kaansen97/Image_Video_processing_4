@@ -15,7 +15,7 @@ sad_gaussian_pyramid = cell(num_levels, 1);
 sad_gaussian_pyramid{1} = im2double(sad_gray);
 
 for i = 2:num_levels
-    blurred = imgaussfilt(sad_gaussian_pyramid{i-1}, 2^(i-1));
+    blurred = imgaussfilt(sad_gaussian_pyramid{i-1}, 2^(i-4));
     expanded = imresize(blurred, size(sad_gaussian_pyramid{i-1}), 'bicubic');
     sad_laplacian_pyramid{i-1} = sad_gaussian_pyramid{i-1} - expanded;
     sad_gaussian_pyramid{i} = blurred;
@@ -28,7 +28,7 @@ happy_gaussian_pyramid = cell(num_levels, 1);
 happy_gaussian_pyramid{1} = im2double(happy_gray);
 
 for i = 2:num_levels
-    blurred = imgaussfilt(happy_gaussian_pyramid{i-1}, 2^(i-1));
+    blurred = imgaussfilt(happy_gaussian_pyramid{i-1}, 2^(i-4));
     expanded = imresize(blurred, size(happy_gaussian_pyramid{i-1}), 'bicubic');
     happy_laplacian_pyramid{i-1} = happy_gaussian_pyramid{i-1} - expanded;
     happy_gaussian_pyramid{i} = blurred;
